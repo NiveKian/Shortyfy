@@ -1,8 +1,10 @@
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
+
 from sqlalchemy import create_engine, Column, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+
 from dotenv import load_dotenv
 import os, random, string
 
@@ -23,8 +25,6 @@ engine = create_engine(
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
 
-app = FastAPI() # Cria e executa a API
-
 class URL(Base):
     __tablename__ = "urls"
     short_id = Column(String, primary_key=True, index=True)
@@ -34,6 +34,8 @@ Base.metadata.create_all(bind=engine)
 
 class URLRequest(BaseModel):
     url: str
+
+app = FastAPI() # Cria e executa a API
 
 # Gera strings para servir de URL curtas
 def generate_short_id(length=6):
