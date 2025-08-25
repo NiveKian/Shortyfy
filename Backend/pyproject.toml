@@ -7,10 +7,9 @@ requires-python = ">=3.13"
 
 dependencies = [
     "fastapi[standard]<1.0.0,>=0.114.2",
-    "uvicorn==0.22.0",
-    "sqlalchemy==1.4.46",
-    "python-dotenv==1.0.0",
-    "psycopg[binary]<4.0.0,>=3.1.13"
+    "uvicorn>=0.35.0",
+    "python-dotenv>=1.1.1",
+    "supabase>=2.18.1",
 ]
 
 [tool.uv]

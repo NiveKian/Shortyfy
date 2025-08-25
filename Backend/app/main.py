@@ -1,41 +1,16 @@
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
+from app.db.supabase import create_supabase_client
+import random, string
 
-from sqlalchemy import create_engine, Column, String
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+app = FastAPI() # Cria e executa a API
+print("OK: API CREATED")
 
-from dotenv import load_dotenv
-import os, random, string
-
-# Carrega variáveis do arquivo .env
-load_dotenv() 
-USER = os.getenv("user")
-PASSWORD = os.getenv("password")
-HOST = os.getenv("host")
-PORT = os.getenv("port")
-DBNAME = os.getenv("dbname")
-DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}?sslmode=require"
-
-# Conecta com SSL
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"sslmode":"require"}
-)
-SessionLocal = sessionmaker(bind=engine)
-Base = declarative_base()
-
-class URL(Base):
-    __tablename__ = "urls"
-    short_id = Column(String, primary_key=True, index=True)
-    original_url = Column(String)
-
-Base.metadata.create_all(bind=engine)
+supabase = create_supabase_client() # Cria conexão com DB Supabase
+print("OK: SUPABASE CONECTOR")
 
 class URLRequest(BaseModel):
     url: str
-
-app = FastAPI() # Cria e executa a API
 
 # Gera strings para servir de URL curtas
 def generate_short_id(length=6):
@@ -43,29 +18,45 @@ def generate_short_id(length=6):
 
 @app.post("/shortyfy")
 def shorten_url(request: Request, url_request: URLRequest):
-    db = SessionLocal()
-    
-    # Verifica se já existe essa URL
-    existing = db.query(URL).filter(URL.original_url == url_request.url).first()
-    if existing:
-        return {"short_url": f"{str(request.base_url)}{existing.short_id}"}
-    
-    # Gera short_id único
-    while True:
-        short_id = generate_short_id()
-        if not db.query(URL).filter(URL.short_id == short_id).first():
-            break
-    
-    url = URL(short_id=short_id, original_url=url_request.url)
-    db.add(url)
-    db.commit()
-    db.refresh(url)
-    return {"short_url": f"{str(request.base_url)}{short_id}"}
+    try:
+        # Verifica se já existe essa URL
+        response = (
+            supabase.table("urls")  # type: ignore
+            .select("*")
+            .eq("original_url", url_request.url)
+            .limit(1)
+            .execute()
+        )
+        if response.data and len(response.data) > 0:
+            existing = response.data[0]
+            return {"short_url": f"{str(request.base_url)}{existing['short_id']}"}
+
+        # Gera short_id único
+        while True:
+            short_id = generate_short_id()
+            check = supabase.table("urls").select("*").eq("short_id", short_id).limit(1).execute()
+            if not check.data or len(check.data) == 0:
+                break
+
+        # Insere no Supabase
+        supabase.table("urls").insert({
+            "short_id": short_id,
+            "original_url": url_request.url
+        }).execute()
+
+        return {"short_url": f"{str(request.base_url)}{short_id}"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao acessar Supabase: {e}")
+
 
 @app.get("/{short_id}")
 def redirect_url(short_id: str):
-    db = SessionLocal()
-    url = db.query(URL).filter(URL.short_id == short_id).first()
-    if url:
-        return {"redirect": url.original_url}
-    raise HTTPException(status_code=404, detail="URL não encontrada")
+    try:
+        response = supabase.table("urls").select("*").eq("short_id", short_id).limit(1).execute()
+        if response.data and len(response.data) > 0:
+            url = response.data[0]
+            return {"redirect": url["original_url"]}
+        raise HTTPException(status_code=404, detail="URL não encontrada")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao acessar Supabase: {e}")
