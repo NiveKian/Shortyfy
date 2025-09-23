@@ -7,9 +7,11 @@ from dotenv import load_dotenv
 load_dotenv()
 FRONT_DOMAIN = os.getenv("SHORTYFY_FRONT_DOMAIN")
 
-origins = ["http://localhost:5173"]
+origins = ["http://localhost:3000"]
 if FRONT_DOMAIN is not None:
     origins.append(FRONT_DOMAIN)
+    
+print(origins)
 
 app = FastAPI()
 

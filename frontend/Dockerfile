@@ -1,23 +1,20 @@
 # Build stage
+
 FROM node:20-alpine AS build
-
 WORKDIR /app
-
-# Copy dependency files first
 COPY package.json package-lock.json ./
-
 RUN npm ci
-
-# Copy the rest of the source code
 COPY . .
-
 RUN npm run build
 
 # Production stage
-FROM nginx:alpine
 
-COPY --from=build /app/dist /usr/share/nginx/html
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=build /app/dist ./dist
+RUN npm install -g serve
+EXPOSE 3000
 
-EXPOSE 80
+# Execute the application
 
-CMD ["nginx","-g","daemon off;"]
+CMD ["serve", "-s", "dist", "-l", "3000"]
