@@ -1,8 +1,9 @@
-FROM node:18-alpine AS build
+# Build stage
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json* ./
 
 RUN npm install
 
@@ -10,15 +11,11 @@ COPY . .
 
 RUN npm run build
 
-FROM node:18-alpine
+# Production stage
+FROM nginx:alpine
 
-WORKDIR /app
+COPY --from=build /app/dist /usr/share/nginx/html
 
-# Install 'serve' to serve the static files
-RUN npm install -g serve
+EXPOSE 80
 
-COPY --from=build /app/dist ./dist
-
-EXPOSE 4173
-
-CMD ["serve", "-s", "dist", "-l", "4173"]
+CMD ["nginx","-g","daemon off;"]

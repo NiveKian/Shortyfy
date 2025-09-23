@@ -22,10 +22,15 @@ services:
     container_name: shortyfy-backend
     ports:
       - "8000:8000"
+    environment:
+      - UVICORN_RELOAD=true  # ativa o reload automático para desenvolvimento
     env_file:
       - ./backend/.env  # contém SUPABASE_URL, SUPABASE_KEY, etc
     networks:
       - shortyfy-net
+    volumes:
+      - .:/app
+    tty: true
 
 networks:
   shortyfy-net:
