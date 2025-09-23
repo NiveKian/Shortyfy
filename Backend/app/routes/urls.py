@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import RedirectResponse
 from app.db.supabase import create_supabase_client
 from app.models.url_request import URLRequest
 from app.utils.shortener import generate_short_id
@@ -57,9 +58,10 @@ def redirect_url(short_id: str):
             .limit(1)
             .execute()
         )
+        
         if response.data and len(response.data) > 0:
-            url = response.data[0]
-            return {"redirect": url["original_url"]}
+            url = response.data[0]["original_url"]
+            return RedirectResponse(url)
 
         raise HTTPException(status_code=404, detail="URL não encontrada")
 

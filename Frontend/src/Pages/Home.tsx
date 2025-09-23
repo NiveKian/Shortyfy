@@ -1,11 +1,11 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { checkURL , checkHTTP} from "../util/tools";
 import { toast, ToastContainer } from 'react-toastify';
-import { checkURL } from "../util/tools";
 import 'react-toastify/dist/ReactToastify.css';
 
 interface ShortenResponse {
-  shortUrl: string
+  short_url: string
 }
 
 export const Home = () => {
@@ -18,16 +18,18 @@ export const Home = () => {
 
       if (!checkURL(url)) throw new Error("O Link inserido não é valido!")
 
+      const checked_url = checkHTTP(url)
+
       const response = await fetch("http://localhost:8000/shorten", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({ url: checked_url }),
       })
 
       if (!response.ok) throw new Error("Erro ao encurtar o link!")
 
       const data = (await response.json()) as ShortenResponse
-      navigate("/Result", { state: { shortUrl: data.shortUrl } })
+      navigate("/result", { state: { shortUrl: data.short_url } })
 
     } catch (err: any) {
       toast.error("Error trying to fetch API", {

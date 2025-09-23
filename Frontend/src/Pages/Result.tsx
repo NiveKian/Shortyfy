@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom"
 import { useLocation } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface LocationState {
   shortUrl: string
@@ -6,14 +9,23 @@ interface LocationState {
 
 export const Result = () => {
 
+  const navigate = useNavigate()
   const location = useLocation()
-  // console.log(location.state)
-  const state = location.state as LocationState
+  const state = location.state as LocationState | null;
   const shortUrl = state?.shortUrl
 
   const handleCopy = () => {
+    if (!shortUrl) return;
     navigator.clipboard.writeText(shortUrl)
-    alert("Link copiado!") // Toasst ?
+    toast.success("Link Copiado!", {
+      position: "top-right",
+      theme: "colored",
+    });
+  }
+
+  const openLink = () => {
+    if (!shortUrl) navigate("/");
+    window.open(shortUrl, "_blank")
   }
 
   return (
@@ -32,26 +44,26 @@ export const Result = () => {
           readOnly
           type="text"
           value={shortUrl}
-          className="w-full max-w-3xl bg-white/5 border border-white/10 rounded px-4 py-3 text-white transition focus:outline-none focus:border-green-400 focus:bg-red-500/5 text-lg text-center shadow-sm"
+          className="w-full max-w-3xl bg-red-500/5 border-red-400 rounded px-4 py-3 text-white transition outline-none focus:border-red-400 text-lg text-center shadow-sm"
         ></input>
       </div>
 
       <div className="flex flex-row justify-center items-center gap-4">
         <button
           onClick={handleCopy}
-          className="bg-green-500 hover:bg-green-800 text-white px-4 py-2 rounded text-xl font-bold"
+          className="bg-red-500 hover:bg-red-800 text-white px-4 py-2 rounded text-xl font-bold"
         >
           Copy
         </button>
 
         <button
-          onClick={() => window.open(shortUrl, "_blank")}
+          onClick={openLink}
           className="bg-green-500 hover:bg-green-800 text-white px-4 py-2 rounded text-xl font-bold"
         >
           Redirect
         </button>
       </div>
-
+      <ToastContainer aria-label={undefined} />
     </div>
   )
 }
