@@ -1,0 +1,26 @@
+previews:
+      generation: manual
+services:
+  - type: web
+    name: shortyfy-backend
+    env: docker
+    dockerfilePath: backend/Dockerfile
+    plan: free
+    envVars:
+      - key: SUPABASE_URL
+        value: "<YOUR_SUPABASE_URL>"
+      - key: SUPABASE_ANON_KEY
+        value: "<YOUR_SUPABASE_KEY>"
+      - key: SHORTYFY_FRONT_DOMAIN
+        value: "https://shortyfy-frontend.onrender.com"
+    autoDeploy: true
+
+  - type: web
+    name: shortyfy-frontend
+    env: docker
+    dockerfilePath: frontend/Dockerfile
+    plan: free
+    envVars:
+      - key: VITE_API_URL
+        value: "https://shortyfy-backend.onrender.com"
+    autoDeploy: true
