@@ -1,29 +1,25 @@
-# Build Stage
+# Build stage
 FROM python:3.13-slim-bookworm AS builder
 
+# Copy uv binary
 COPY --from=ghcr.io/astral-sh/uv:0.5.11 /uv /bin/uv
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 
 WORKDIR /app
 
-# Copy dependency files first (to leverage caching)
+# Copy only dependency files first
 COPY uv.lock pyproject.toml ./
 
 # Install dependencies
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-install-project
+RUN uv sync --frozen --no-install-project
 
-
-# Copy app folder
+# Copy the app folder
 COPY app ./app
 
-# Final uv sync to make sure everything is set
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen
-
-# Final Stage Production Image
+# Final image
 FROM python:3.13-slim-bookworm AS final
 
+WORKDIR /app
 COPY --from=builder /app /app
 
 ENV PATH="/app/.venv/bin:$PATH"
