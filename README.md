@@ -7,13 +7,23 @@ E consumir a API em um ambiente React
 
 ```bash
 backend/
-├── tests/
-│   ├── __init__.py
-│   └── test_url.py
+├── app/
+│   ├── db/
+│   │   └── supabase.py
+│   ├── models/
+│   │   └── url_request.py
+│   ├── routes/
+│   │   └── urls.py
+│   ├── utils/
+│   │   └── shortener.py
+│   └── main.py
 ├── .env
 ├── .env.example
-├── main.py
-└── requirements.txt
+├── .python-version
+├── Dockerfile
+├── pyproject.toml
+├── Readme.md
+└── uv.lock
 ```
 
 ## Estrutura Frontend
@@ -23,6 +33,11 @@ frontend/
 ├── public/
 ├── src/
 │   ├── assests/
+│   ├── pages/
+│   │   ├── Home.py
+│   │   └── Result.tsx
+│   ├── util/
+│   │   └── tools.ts
 │   ├── App.css
 │   ├── App.tsx
 │   ├── index.css

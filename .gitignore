@@ -21,6 +21,7 @@ openapi.json
 /playwright/.cache/
 /playwright/.auth/
 .env
+.env.production
 
 # python
 __pycache__

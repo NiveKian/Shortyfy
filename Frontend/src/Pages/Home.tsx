@@ -12,6 +12,7 @@ export const Home = () => {
 
   const [url, setUrl] = useState("")
   const navigate = useNavigate()
+  const API_URL = import.meta.env.SHORTYFY_API_URL;
 
   const handleSubmit = async () => {
     try {
@@ -20,7 +21,7 @@ export const Home = () => {
 
       const checked_url = checkHTTP(url)
 
-      const response = await fetch("http://localhost:8000/shorten", {
+      const response = await fetch(`${API_URL}/shorten`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: checked_url }),
