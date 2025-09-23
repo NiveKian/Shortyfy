@@ -7,8 +7,9 @@ interface LocationState {
 export const Result = () => {
 
   const location = useLocation()
+  // console.log(location.state)
   const state = location.state as LocationState
-  const shortUrl = state?.shortUrl || ""
+  const shortUrl = state?.shortUrl
 
   const handleCopy = () => {
     navigator.clipboard.writeText(shortUrl)

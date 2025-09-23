@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast, ToastContainer } from 'react-toastify';
+import { checkURL } from "../util/tools";
 import 'react-toastify/dist/ReactToastify.css';
 
 interface ShortenResponse {
@@ -15,13 +16,15 @@ export const Home = () => {
   const handleSubmit = async () => {
     try {
 
+      if (!checkURL(url)) throw new Error("O Link inserido não é valido!")
+
       const response = await fetch("http://localhost:8000/shorten", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url }),
       })
 
-      if (!response.ok) throw new Error("Erro ao encurtar o link")
+      if (!response.ok) throw new Error("Erro ao encurtar o link!")
 
       const data = (await response.json()) as ShortenResponse
       navigate("/Result", { state: { shortUrl: data.shortUrl } })
