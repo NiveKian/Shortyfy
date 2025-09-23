@@ -1,5 +1,4 @@
-previews:
-      generation: manual
+
 services:
   - type: web
     name: shortyfy-backend
