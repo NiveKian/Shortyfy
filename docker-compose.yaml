@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: shortyfy-frontend
+    ports:
+      - "4173:4173"
+    environment:
+      - VITE_API_URL=http://backend:8000  # comunica com o backend via network do docker
+    depends_on:
+      - backend
+    networks:
+      - shortyfy-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: shortyfy-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env  # contém SUPABASE_URL, SUPABASE_KEY, etc
+    networks:
+      - shortyfy-net
+
+networks:
+  shortyfy-net:
+    driver: bridge
