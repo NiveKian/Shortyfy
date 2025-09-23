@@ -3,10 +3,12 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
+# Copy dependency files first
+COPY package.json package-lock.json ./
 
-RUN npm install
+RUN npm ci
 
+# Copy the rest of the source code
 COPY . .
 
 RUN npm run build
