@@ -3,7 +3,7 @@ services:
   - type: web
     name: shortyfy-backend
     env: docker
-    dockerfilePath: backend/Dockerfile
+    dockerfilePath: Backend/Dockerfile
     plan: free
     envVars:
       - key: SUPABASE_URL
@@ -17,7 +17,7 @@ services:
   - type: web
     name: shortyfy-frontend
     env: docker
-    dockerfilePath: frontend/Dockerfile
+    dockerfilePath: Frontend/Dockerfile
     plan: free
     envVars:
       - key: VITE_API_URL
