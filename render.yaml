@@ -7,9 +7,9 @@ services:
     plan: free
     envVars:
       - key: SUPABASE_URL
-        value: "<YOUR_SUPABASE_URL>"
+        sync: false
       - key: SUPABASE_ANON_KEY
-        value: "<YOUR_SUPABASE_KEY>"
+        sync: false
       - key: SHORTYFY_FRONT_DOMAIN
         value: "https://shortyfy-frontend.onrender.com"
     autoDeploy: true
